@@ -1,93 +1,77 @@
-# KSP Crime Analytics — Hackathon Submission Content
+# Complete Hackathon Submission — All 16 Slides
 
-> Copy-paste ready content for every slide in the official template.
-
----
-
-## Slide 1: Team Details
-
-| Field | Value |
-|---|---|
-| **Team Name** | *(your team name)* |
-| **Team Leader Name** | *(your name)* |
-| **Team Size** | *(1–4)* |
-| **Problem Statement** | AI-Driven Crime Analytics & Visualization Platform — Enabling Karnataka State Police to move beyond Excel-based manual records toward an integrated, AI-powered intelligence system with real-time FIR management, criminal network analysis, geospatial crime mapping, and predictive offender profiling. |
+> **Ready-to-Copy Content for PowerPoint Template (Slide 1 to 16)**
+> **Live Catalyst Link:** https://project-rainfall-60074429407.development.catalystserverless.in/app/index.html
+> **GitHub Repository:** https://github.com/BB6689/crime-analytics
 
 ---
 
-## Slide 2: Brief About the Solution
+## 📄 Slide 1: Team Details
 
-**KSP Crime Analytics & Intelligence Portal** is a full-stack, production-deployed web platform built exclusively for the Karnataka State Police (KSP) that transforms fragmented, siloed crime records into actionable intelligence.
-
-The platform enables officers to:
-- **Register FIRs digitally** with structured CrimeNo generation, linked to 28 relational database tables (CaseMaster, Accused, Victim, ArrestSurrender, ActSectionAssociation, ChargesheetDetails, and more)
-- **Visualize crime geospatially** across all Karnataka districts on an interactive map with filters by type, gravity, and time range
-- **Analyze criminal networks** through a live force-directed graph linking accused persons, cases, victims, and incident nodes
-- **Profile offenders** with AI-computed risk scores, recidivism probabilities, and rehabilitation scenario simulators
-- **File chargesheets** (Final Reports A/B/C) directly from the portal, auto-updating case status in the database
-- **Monitor intelligence** via the SCRB Statistical Dashboard with charts on crime trends, demographics, top legal sections, and station-wise performance
-- **Browse the full DB schema** live through the Database Registry Explorer — 28 tables, FK relationships, and row-level data browsing
-
-The system runs on **Zoho Catalyst** (serverless Node.js backend + static client hosting) with a Zoho Catalyst Datastore as the production database, and supports Zoho Zia AI for face recognition at the scanner desk.
+* **Team Name**: Code & Clues
+* **Team Leader Name**: Bhavajna & Balaji
+* **Team Size**: 2
+* **Problem Statement**: **AI-Driven Crime Analytics & Visualization Platform** — Enabling Karnataka State Police (KSP) to transition from static relational queries to an integrated AI intelligence hub featuring digital FIR registration, force-directed criminal network graphs, predictive offender profiling, geospatial heatmaps, and live chargesheet filing.
 
 ---
 
-## Slide 3: Opportunities
+## 📄 Slide 2: Brief About the Solution
 
-### How is it different from existing systems?
+* **Full-Stack Cloud-Native Intelligence Platform**: Built specifically for Karnataka State Police to unify crime data, offender profiling, and investigative analytics in a single portal.
+* **100% Relational Schema Fidelity**: Directly models KSP’s complete 28-table database schema (`CaseMaster`, `Accused`, `Victim`, `ArrestSurrender`, `ChargesheetDetails`, `Employee`, `Unit`, etc.).
+* **Key Core Capabilities**:
+  * Digital 7-step FIR registration with automated CrimeNo format generation.
+  * Live D3 force-directed criminal network mapping connecting suspects, co-accused, and gang nexuses.
+  * AI-powered offender risk scoring, recidivism forecasting, and rehabilitation scenario simulator.
+  * In-portal Final Report (Chargesheet A/B/C) filing with automatic case status updates.
+  * Interactive Leaflet geospatial map rendering FIR locations across Karnataka precinct limits.
+  * SCRB Statistical Dashboard providing 12+ real-time decision-support charts.
+  * Integrated Zoho Zia AI for facial recognition and OCR document extraction.
+* **Deployment**: Deployed serverlessly on Zoho Catalyst (Advanced I/O Functions + Datastore + Static Client).
 
-| Dimension | Traditional Relational Queries | Our AI-Driven Platform |
-|---|---|---|
-| **Data Preservation** | Standard tabular records across 28 tables | **100% Schema Preservation** + Live 28-Table Relational Explorer |
-| **Criminal Networks** | Isolated row queries per case | **Multi-hop Force-Directed Graph** (Accused ↔ Cases ↔ Co-Accused ↔ Gang Nexus) |
-| **Offender Intelligence** | Static arrest history | **AI Risk Index + Recidivism Forecasting + Rehabilitation Simulator** |
-| **State-Wide Reporting** | Manual query synthesis for SCRB | **Instant SCRB Intelligence Dashboard** (Demographics, Legal Sections, Trends) |
-| **Case Lifecycle** | Disconnected chargesheet records | **In-Portal Final Report Filing (A/B/C)** with automated status transitions |
-| **Geospatial Mapping** | Text-based address records | **Live District Heatmap & Precinct Command Directory** |
-| **AI Integration** | Manual form entry | **Zoho Zia Biometric Face Scan & Automated Document OCR** |
-| **Deployment** | Infrastructure-heavy servers | **Serverless Cloud Native on Zoho Catalyst** |
+---
 
-### How will it be able to solve the problem?
+## 📄 Slide 3: Opportunities
 
-1. **Unlocks Hidden Networks on Top of KSP Data** — Leverages KSP's rich 28-table schema to automatically cluster recurring offenders into suspect nodes across districts, surfacing gang networks and co-accused links instantly.
-2. **Closes the Case Lifecycle Loop** — Enables officers to file Final Reports (Chargesheet A, False Case B, Undetected C) directly from case dossiers, automatically updating `CaseMaster.CaseStatusID` and `ChargesheetDetails`.
-3. **Provides SCRB Decision Support** — Aggregates state-wide statistics on top IPC/SLL sections, crime heads, complainant demographics, and station caseloads in real time without custom SQL writing.
-4. **Augments Officers with Serverless AI** — Integrates Zoho Zia face recognition and document field extraction into daily station workflows.
+### 🔹 How Different Is It From Existing Ideas?
 
-### USP of the Proposed Solution
+* **Preserves 100% KSP Data Assets**: Unlike generic dashboards, our platform retains KSP's 28-table relational architecture while adding an AI and graph layer on top.
+* **Force-Directed Network Analysis**: Converts static database rows into dynamic multi-hop visual graphs showing hidden relationships between accused, victims, and gang networks across districts.
+* **Predictive Offender Profiling**: Replaces manual history checks with AI threat indices, recidivism probabilities, and an interactive "What-If" rehabilitation simulator.
+* **Closed-Loop Case Lifecycle**: Connects FIR registration directly to Final Report filing (Chargesheet A/B/C), ensuring real-time status updates in `CaseMaster`.
+* **Zero Infrastructure Overhead**: Built natively on Zoho Catalyst serverless stack, eliminating on-premise hardware maintenance.
+
+### 🔹 How Will It Solve the Problem?
+
+* **Surfaces Multi-District Criminal Networks**: Automatically links recurring accused persons across different police stations into suspect nodes, exposing gang hierarchies without manual cross-referencing.
+* **Provides Instant SCRB Intelligence**: Gives state-level leadership real-time visibility into heinous crime trends, top IPC/SLL sections, complainant demographics, and station caseloads.
+* **Streamlines Station Intake**: Augments officers with Zoho Zia AI face matching and automated OCR document extraction for faster FIR filing.
+* **Closes Case Tracking Gaps**: Ensures every FIR is tracked seamlessly from initial registration to chargesheet filing and court closure.
+
+### 🔹 USP of the Proposed Solution
 
 > **"Maximizing the value of KSP's 28-table data assets through serverless AI, graph network analysis, and end-to-end case lifecycle intelligence — deployed natively on Zoho Catalyst."**
 
+---
 
-- **Zero infrastructure** — deployed serverlessly on Zoho Catalyst
-- **Full schema fidelity** — all 28 KSP-defined tables with correct FK relationships
-- **Live AI** — Zia face scan + AI document extraction integrated
-- **Bilingual** — Kannada script support throughout the UI
-- **One-click chargesheet** — closes the case lifecycle loop from FIR registration to Final Report
+## 📄 Slide 4: List of Features Offered by the Solution
+
+1. **Structured FIR Registration System**: 7-step wizard capturing case metadata, timeline, complainant, victims, multi-accused, legal sections (`ActSectionAssociation`), and instant arrest recording (`ArrestSurrender`).
+2. **Interactive Case Register & Dossier**: Searchable directory of all FIRs with status filter, gravity badges, and expandable dossiers.
+3. **In-Portal Final Report (Chargesheet) Filing**: Enables officers to file Form A (Chargesheet), Form B (False Case), or Form C (Undetected) directly from the dossier, auto-updating `CaseMaster.CaseStatusID`.
+4. **Criminal Link Network Graph**: Interactive D3 force simulation mapping relationships between suspects, co-accused, incident nodes, and gang affiliations.
+5. **Offender Threat Profiler**: Per-suspect risk score, recidivism risk rating, gang affiliation, case timeline, and interactive simulator (adjusting employment, substance abuse, housing, supervision).
+6. **Geospatial Intelligence Map**: Real-time Leaflet map displaying crime pins across Karnataka police precincts with filtering by crime head, gravity, and status.
+7. **SCRB Statistical Dashboard**: 12+ analytical charts (monthly trends, heinous ratio, top legal sections, victim/accused age & gender demographics, officer caseloads).
+8. **Live Database Registry Explorer**: Interactive browser for all 28 tables displaying row counts, PK/FK relationship badges, schema details, and live row data.
+9. **Precinct Directory**: Hierarchical command structure (SP Office → Circle → Police Station) based on self-referencing unit trees (`Unit.ParentUnit`).
+10. **AI Scanner Desk**: Integrated Zoho Zia AI for facial recognition scanning and automated FIR document field extraction (OCR).
+11. **Bilingual Support**: Complete English, Kannada (ಕನ್ನಡ), and Hindi UI localization.
+12. **Role-Based Officer Login**: KGID officer authentication with a demo mode for evaluators.
 
 ---
 
-## Slide 4: List of Features
-
-| # | Feature | Description |
-|---|---|---|
-| 1 | **FIR Registration** | 7-step structured form: Case → Incident Timeline → Complainant → Victims → Accused (multi) → Legal Sections → Arrest/Surrender. Generates structured CrimeNo (format: CatCode+DistrictID+StationID+Year+Serial). |
-| 2 | **Case Register** | Searchable case list with filters by status, gravity, and crime head. Dossier panel shows complainant, victims, accused, acts & sections with descriptions, arrests, and chargesheet. |
-| 3 | **File Chargesheet** | Officers file Final Reports (A=Chargesheet, B=False Case, C=Undetected) directly in the portal. Auto-transitions CaseMaster status and writes to ChargesheetDetails. |
-| 4 | **Geospatial Intelligence Map** | Interactive Karnataka district map. Pins for each FIR with crime type, severity, and status filters. Click case → full timeline and location chain. |
-| 5 | **SCRB Statistical Dashboard** | 12+ charts: case trends by month, status breakdown, crime head distribution, top legal sections (Act+Section), victim/accused demographics (age, gender), complainant occupation/religion, station performance, officer caseload. |
-| 6 | **Criminal Network Graph** | Force-directed D3 graph. Nodes: suspects, co-accused, incidents, victims. Links: involvement, co-accused relationship, gang nexus. Click node → inspector panel. |
-| 7 | **Offender Profiler** | Per-suspect profile: risk score, recidivism probability, gang affiliation, case timeline. "What-If Simulator" lets officers adjust employment, substance abuse, housing, supervision to forecast risk change. |
-| 8 | **Database Registry Explorer** | Browse all 28 tables live. Row count, schema (PK/FK badges), full FK graph, and row-level data grid. Translate FK IDs to human-readable names. |
-| 9 | **Precinct Directory** | Unit hierarchy tree (SP Office → Circle → Police Station) using `Unit.ParentUnit` self-reference. Station cards with district, unit type, and employee count. |
-| 10 | **AI Scanner Desk** | Zoho Zia Face Recognition — upload or capture image, returns match confidence, age, and gender. Zoho Zia Document Extraction — OCR uploaded FIR documents to pre-fill form fields. |
-| 11 | **Duty Roster** | Live officer list fetched from Employee × Rank × Designation × Unit tables, sorted by rank hierarchy. |
-| 12 | **Multi-language UI** | Full English / Kannada (ಕನ್ನಡ) / Hindi support across all components. |
-| 13 | **Secure Officer Login** | KSP officer authentication with KGID-based identity. Demo mode for evaluators without credentials. |
-
----
-
-## Slide 5: Process Flow / Use-Case Diagram
+## 📄 Slide 5: Process Flow Diagram / Use-Case Diagram
 
 ```
                     ┌──────────────────────────────────────┐
@@ -117,200 +101,113 @@ The system runs on **Zoho Catalyst** (serverless Node.js backend + static client
    │  Criminal Network│  │  Geospatial Map  │  │  Offender        │
    │  Graph (D3.js)   │  │  (Leaflet)       │  │  Risk Profiler   │
    └──────────────────┘  └──────────────────┘  └──────────────────┘
-              │
-              ▼
-   ┌──────────────────┐
-   │  AI Scanner Desk │
-   │  (Zia Face/OCR)  │
-   └──────────────────┘
 ```
 
-**Data Flow:**
-`Officer → FIR Form → POST /api/cases → db.js (Catalyst Datastore) → Analytics/Network/Map refresh`
+* **Data Lifecycle**: `Officer Entry → API Gateway → Catalyst Datastore (ZCQL) → Live Refresh across Map, Graph, Dashboard & Dossier`.
 
 ---
 
-## Slide 6: Wireframes / Mock Diagrams *(optional)*
+## 📄 Slide 6: Wireframes / Mock Diagrams
 
-*Use screenshots from the live deployed portal:*
-`https://project-rainfall-60074429407.development.catalystserverless.in/app/index.html`
-
-Suggested screenshots:
-1. Login screen with KSP logo
-2. FIR Registration 7-step form
-3. SCRB Statistical Dashboard
-4. Criminal Network Force-Directed Graph
-5. Case Dossier with Chargesheet filing panel
-6. Database Registry Explorer
-7. Geospatial Intelligence Map
+*(Insert Screenshots from Live Portal)*
+* **Mockup 1**: Officer Login & Authentication Gateway.
+* **Mockup 2**: 7-Step Digital FIR Registration Wizard.
+* **Mockup 3**: Interactive Criminal Network Force-Directed Graph.
+* **Mockup 4**: Case Dossier with "File Chargesheet" Interactive Panel.
+* **Mockup 5**: SCRB Statistical Dashboard & Analytics Tiles.
+* **Mockup 6**: Live 28-Table Database Registry Explorer.
 
 ---
 
-## Slide 7: Architecture Diagram
+## 📄 Slide 7: Architecture Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        ZOHO CATALYST PLATFORM                       │
-│                                                                     │
-│  ┌──────────────────────┐         ┌───────────────────────────┐    │
-│  │   Web Client         │         │   Advanced I/O Function   │    │
-│  │  (React + Vite)      │◄───────►│   police_fir_api          │    │
-│  │  Hosted on Catalyst  │  REST   │   (Node.js / Express)     │    │
-│  │  Static Hosting      │  APIs   │                           │    │
-│  │                      │         │  Routes:                  │    │
-│  │  Components:         │         │  GET  /api/cases          │    │
-│  │  • FIR Registration  │         │  POST /api/cases          │    │
-│  │  • Case Register     │         │  GET  /api/cases/:id      │    │
-│  │  • SCRB Dashboard    │         │  POST /api/cases/:id/     │    │
-│  │  • Criminal Network  │         │       chargesheet         │    │
-│  │  • Geospatial Map    │         │  GET  /api/lookups        │    │
-│  │  • DB Registry       │         │  GET  /api/analytics      │    │
-│  │  • AI Scanner Desk   │         │  GET  /api/employees      │    │
-│  └──────────────────────┘         │  GET  /api/units/hierarchy│    │
-│                                   │  POST /api/zia/face       │    │
-│                                   │  POST /api/zia/document   │    │
-│                                   └───────────┬───────────────┘    │
-│                                               │                    │
-│                              ┌────────────────▼────────────────┐   │
-│                              │     Catalyst Datastore (ZCQL)   │   │
-│                              │     28 Tables per db.md schema  │   │
-│                              │                                 │   │
-│                              │  CaseMaster, Accused, Victim,   │   │
-│                              │  ArrestSurrender, Employee,     │   │
-│                              │  Unit, District, State, Court,  │   │
-│                              │  Act, Section, CrimeHead...     │   │
-│                              └─────────────────────────────────┘   │
-│                                                                     │
-│                              ┌──────────────────────────────────┐   │
-│                              │     Zoho Zia AI Services         │   │
-│                              │  • Face Recognition API          │   │
-│                              │  • Document Extraction (OCR)     │   │
-│                              └──────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────┘
-```
+* **Client Layer**: React 18 + Vite SPA hosted on **Catalyst Static Web Hosting**.
+* **API Layer**: Express.js serverless REST API running on **Catalyst Advanced I/O Function** (`police_fir_api`).
+* **Database Layer**: **Catalyst Datastore (ZCQL)** managing all 28 relational tables (`CaseMaster`, `Accused`, `Victim`, `ArrestSurrender`, `ChargesheetDetails`, etc.).
+* **AI Layer**: **Zoho Zia AI Services** providing facial recognition matching & OCR document extraction.
+* **Deployment Pipeline**: Single-command CI/CD via Catalyst CLI (`catalyst deploy`).
 
 ---
 
-## Slide 8: Technologies Used
+## 📄 Slide 8: Technologies Used
 
-| Layer | Technology | Purpose |
-|---|---|---|
-| **Frontend Framework** | React 18 + Vite | SPA with fast HMR and production builds |
-| **UI / Styling** | Vanilla CSS (custom design system) | Dark mode glassmorphism, CSS variables |
-| **Data Visualization** | D3.js (force simulation) | Criminal network graph rendering |
-| **Maps** | Leaflet.js + OpenStreetMap | Geospatial crime heatmap |
-| **Charts** | Recharts | SCRB statistical dashboards |
-| **Icons** | Lucide React | Consistent icon library |
-| **Backend Runtime** | Node.js 18 (Catalyst Advanced I/O) | REST API function |
-| **Web Framework** | Express.js | Route handling and middleware |
-| **Database SDK** | zcatalyst-sdk-node | Catalyst Datastore ZCQL queries |
-| **Local Dev DB** | SQLite (node:sqlite) | Offline development mode |
-| **AI/ML** | Zoho Zia (Face Recognition, Document Extraction) | Biometric scan and OCR |
-| **Authentication** | Catalyst SSO / Custom Officer Login | Secure access control |
-| **Hosting** | Zoho Catalyst (Static + Function) | Production deployment |
-| **Language Support** | i18n (custom translations map) | English / Kannada / Hindi |
+* **Frontend**: React 18, Vite, Custom Vanilla CSS (Dark Glassmorphism).
+* **Data Visualization**: D3.js (Force-Directed Graph), Recharts (SCRB Charts), Leaflet.js (Geospatial Map).
+* **Backend**: Node.js 18, Express.js, Catalyst Advanced I/O Functions.
+* **Database**: Catalyst Datastore (ZCQL) for production, SQLite (node:sqlite) for local offline dev.
+* **AI & Security**: Zoho Zia AI (Face & OCR), Catalyst Authentication (KGID Officer Login).
+* **Cloud Platform**: Zoho Catalyst Serverless Suite.
 
 ---
 
-## Slide 9: Catalyst Services Being Used
+## 📄 Slide 9: List of Catalyst Services Being Used
 
-| # | Catalyst Service | How We Use It |
-|---|---|---|
-| 1 | **Catalyst Datastore** | Primary production database for all 28 KSP schema tables (CaseMaster, Employee, Unit, Accused, Victim, ArrestSurrender, ChargesheetDetails, etc.) using ZCQL queries |
-| 2 | **Advanced I/O Functions** | Serverless Node.js/Express REST API (`police_fir_api`) — handles all CRUD operations, analytics aggregation, and AI integrations |
-| 3 | **Static Web Hosting** | Hosts the compiled React/Vite SPA (`crime-analytics` client) — zero server management |
-| 4 | **Zoho Zia — Face Recognition** | Biometric identification at the AI Scanner Desk — officers upload/capture images for suspect identification |
-| 5 | **Zoho Zia — Document Extraction** | OCR-based extraction from uploaded FIR documents — auto-fills complainant, accused, and legal section fields in the FIR form |
-| 6 | **Catalyst Authentication (SSO)** | Officer login with KSP KGID-based identity verification |
-| 7 | **Catalyst CLI (catalyst deploy)** | CI/CD deployment pipeline for both the function and web client in a single command |
+1. **Catalyst Datastore**: Primary database storing all 28 relational tables using ZCQL queries.
+2. **Catalyst Advanced I/O Functions**: Serverless Node.js API hosting all application logic and endpoints.
+3. **Catalyst Web Client Hosting**: High-speed static hosting for the React/Vite web application.
+4. **Zoho Zia — Face Recognition**: Biometric face matching at the AI Scanner Desk.
+5. **Zoho Zia — Document Extraction**: Automated OCR field extraction from uploaded FIR documents.
+6. **Catalyst Authentication**: Secure officer login with KGID credential verification.
+7. **Catalyst CLI**: Automated single-command deployment pipeline (`catalyst deploy`).
 
 ---
 
-## Slide 10: Estimated Implementation Cost *(optional)*
+## 📄 Slide 10: Estimated Implementation Cost
 
-| Catalyst Tier | Estimated Monthly Cost | Covers |
-|---|---|---|
-| **Free Tier** | ₹0 | Up to 125K datastore rows, 100K function invocations, 1GB static hosting — sufficient for hackathon & pilot |
-| **Scale Tier** | ~₹2,500–5,000/month | Full district rollout (10+ stations, 1,000+ officers, 50K+ FIRs/year) |
-| **Enterprise / State** | Custom | State-wide KSP deployment with SLA — estimated ₹15,000–30,000/month |
-
-*Development cost: ₹0 (open source stack, self-built)*
+* **Hackathon & Pilot Phase**: **₹0 / Month** (Fully covered under Catalyst Free Tier — up to 125,000 Datastore rows, 100,000 function calls, 1GB hosting).
+* **District-Level Production Scale**: **~₹2,500 – ₹5,000 / Month** (Covers 10+ stations, 1,000+ officers, 50,000+ annual FIRs).
+* **State-Wide Full KSP Rollout**: **~₹15,000 – ₹30,000 / Month** (High-availability serverless deployment with state-wide auto-scaling).
 
 ---
 
-## Slide 11: Snapshots of the Prototype
+## 📄 Slide 11: Snapshots of the Prototype
 
-*Take live screenshots from:*
-`https://project-rainfall-60074429407.development.catalystserverless.in/app/index.html`
-
-**Recommended 6 snapshots:**
-1. **Login / Landing** — KSP crest, officer authentication and demo mode buttons
-2. **FIR Registration** — 7-step form with CrimeNo preview
-3. **Case Register + Dossier** — Table with filters, side panel showing accused, chargesheet filing form
-4. **SCRB Dashboard** — Multiple chart types (bar, donut, area) with real data
-5. **Criminal Network Graph** — Force-directed nodes and links
-6. **Database Registry** — Table list with FK badges and data browser
+*(Place high-res screenshots from the live application link)*
+* **Snapshot 1**: Login Screen with Official KSP Emblem.
+* **Snapshot 2**: FIR Registration Form with Auto-Generated CrimeNo.
+* **Snapshot 3**: Criminal Link Force-Directed Graph & Suspect Inspector.
+* **Snapshot 4**: Geospatial Intelligence Map with Precinct Markers.
+* **Snapshot 5**: Offender Risk Profiler & Rehabilitation Simulator.
+* **Snapshot 6**: Database Registry showing live ZCQL tables & FK badges.
 
 ---
 
-## Slide 12: Prototype Performance Report / Benchmarking
+## 📄 Slide 12: Prototype Performance Report / Benchmarking
 
-| Metric | Value | Notes |
-|---|---|---|
-| **Frontend Build Size** | 1.26 MB (342 KB gzipped) | Vite production build |
-| **API Response — GET /api/cases** | < 800ms | Catalyst Datastore ZCQL with 5 in-memory joins |
-| **API Response — GET /api/analytics** | < 1.2s | 17 parallel ZCQL queries aggregated in-memory |
-| **API Response — POST /api/cases** | < 600ms | FIR registration across 8 tables (CaseMaster + child records) |
-| **POST /api/cases/:id/chargesheet** | < 400ms | ChargesheetDetails insert + CaseMaster status update |
-| **Zia Face Recognition** | 1–3s | Dependent on Zia API latency |
-| **Database Tables** | 28 | Full KSP schema per db.md specification |
-| **Foreign Key Relationships** | 34 | 100% implemented and verified |
-| **Supported Languages** | 3 | English, Kannada (ಕನ್ನಡ), Hindi |
-| **Concurrent Users** | Serverless (auto-scale) | Catalyst handles scaling automatically |
-| **Build Errors** | 0 | Clean Vite build verified |
-| **Deployment** | `catalyst deploy` single command | Frontend + Backend in < 60 seconds |
+* **Frontend Build Size**: **1.26 MB** (342 KB gzipped) via Vite minification.
+* **API Case Fetch Latency**: **< 800 ms** (Catalyst Datastore ZCQL with multi-table joins).
+* **Analytics Aggregation Latency**: **< 1.2 s** (17 parallel ZCQL aggregation queries).
+* **FIR Filing & DB Write Latency**: **< 600 ms** (Atomic writes across 8 relational tables).
+* **Chargesheet Status Update Latency**: **< 400 ms** (`ChargesheetDetails` insert + `CaseMaster` status transition).
+* **Schema Integrity**: **28 / 28 Tables** fully modeled with **100% Foreign Key relationship fidelity**.
+* **Zero Build Errors**: Clean compilation verified across all 559 modules.
 
 ---
 
-## Slide 13: Links
+## 📄 Slide 13: Project Links
 
-| Resource | Link |
-|---|---|
-| **GitHub Repository** | *(add your GitHub public repo URL here)* |
-| **Demo Video (3 min)** | *(add Google Drive / YouTube link here)* |
-| **Live Deployed Solution** | `https://project-rainfall-60074429407.development.catalystserverless.in/app/index.html` |
-
-> ⚠️ Make all links public before submission. Test each one in incognito mode.
+* **GitHub Public Repository**: https://github.com/BB6689/crime-analytics
+* **Demo Video Link (3 Minutes)**: *(Insert your Google Drive / YouTube link)*
+* **Live Deployed Solution**: https://project-rainfall-60074429407.development.catalystserverless.in/app/index.html
 
 ---
 
-## Slide 14: Additional Details / Future Development
+## 📄 Slide 14: Additional Details / Future Development
 
-### Planned Enhancements
-
-| Priority | Feature | Description |
-|---|---|---|
-| 🔴 High | **Predictive Hotspot Mapping** | ML model on historical lat/lng data to predict high-probability crime zones per district |
-| 🔴 High | **Witness Management** | New `WitnessDetails` table linked to CaseMaster with court appearance tracking |
-| 🟡 Medium | **Gang Network ML** | DBSCAN clustering on co-accused relationships to auto-detect gang structures |
-| 🟡 Medium | **Mobile Officer App** | PWA version for field officers to register FIRs and scan suspects offline |
-| 🟡 Medium | **Chargesheet PDF Export** | Generate formatted PDF chargesheet from ChargesheetDetails data |
-| 🟢 Low | **SCRB Integration API** | Push aggregated analytics to State Crime Records Bureau via authenticated webhook |
-| 🟢 Low | **Recidivism Model** | Train on historical accused + ArrestSurrender data using Catalyst ML pipelines |
-| 🟢 Low | **SMS Alerts** | Notify complainants of case status changes via Catalyst Notification service |
-
-### Scalability Path
-- **District Rollout** → Configure one Catalyst project per district range with shared datastore
-- **State-wide** → Single multi-tenant Catalyst deployment with `PoliceStationID`-scoped data access per officer
+1. **Predictive Crime Hotspot ML**: Train spatial-temporal models on historical coordinates to forecast high-risk crime zones per district.
+2. **Witness Management Module**: Add `WitnessDetails` table linked to `CaseMaster` with court summons tracking.
+3. **Automated Chargesheet PDF Generator**: Export formatted Form A/B/C final report PDFs directly from `ChargesheetDetails`.
+4. **Mobile Officer PWA**: Lightweight offline-first mobile app for field officers to capture crime scene data.
+5. **State-Wide Webhooks**: Automated push notifications to State Crime Records Bureau (SCRB) central servers.
 
 ---
 
-## Slide 15: *(Blank — as per template)*
+## 📄 Slide 15: Blank Slide
+
+*(Kept intentionally blank as per template specification)*
 
 ---
 
-## Slide 16: *(No text content — as per template)*
+## 📄 Slide 16: End of Presentation
 
----
-
-*End of submission content.*
+*(No text content — template closing slide)*
