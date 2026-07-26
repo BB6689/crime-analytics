@@ -255,18 +255,18 @@ export default function ZiaScanner({ lang = 'en', onAutoFillFIR, onAutoFillEvide
       reader.onload = (event) => {
         const img = new Image();
         img.onload = () => {
-          const maxWidth = 1200;
-          const maxHeight = 1200;
+          // Keep max 800px — smaller payload = faster Zia ML processing
+          const maxDim = 800;
           let width = img.width;
           let height = img.height;
 
-          if (width > maxWidth || height > maxHeight) {
+          if (width > maxDim || height > maxDim) {
             if (width > height) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
             } else {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
             }
           }
 
@@ -275,7 +275,8 @@ export default function ZiaScanner({ lang = 'en', onAutoFillFIR, onAutoFillEvide
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.85));
+          // 0.72 quality — good enough for Zia face/OCR, significantly smaller
+          resolve(canvas.toDataURL('image/jpeg', 0.72));
         };
         img.onerror = () => resolve(event.target.result);
         img.src = event.target.result;
@@ -359,8 +360,11 @@ export default function ZiaScanner({ lang = 'en', onAutoFillFIR, onAutoFillEvide
     setResults(null);
 
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    // Use proper base URL for backend API calls
     const baseUrl = isLocal ? 'http://localhost:3000' : '/server/police_fir_api';
+
+    // 120-second client-side timeout — Zia ML can be slow on large images
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000);
 
     try {
       let endpoint = '/api/zia/face';
@@ -379,8 +383,11 @@ export default function ZiaScanner({ lang = 'en', onAutoFillFIR, onAutoFillEvide
       const response = await fetch(`${baseUrl}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       const rawText = await response.text();
       let data;
@@ -391,17 +398,31 @@ export default function ZiaScanner({ lang = 'en', onAutoFillFIR, onAutoFillEvide
       }
 
       if (!response.ok) {
-        setResults({ 
-          error: data.error || `Zoho Zia AI processing failed (${response.status})`,
-          details: data.details || rawText
+        // 408 = Catalyst function execution time exceeded — guide user to fix
+        const is408 = response.status === 408 || (data?.data?.error_code === 'EXECUTION_TIME_EXCEEDED');
+        setResults({
+          error: is408
+            ? 'Zoho Zia AI processing failed — Function timeout exceeded.'
+            : (data.error || `Zoho Zia AI processing failed (${response.status})`),
+          details: is408
+            ? 'Fix: Go to Catalyst Console → Functions → police_fir_api → Configuration → Timeout → set to 540 seconds. Then redeploy.'
+            : (data.details || rawText)
         });
         return;
       }
 
       setResults(data);
     } catch (e) {
-      console.error("Zia AI Error:", e);
-      setResults({ error: e.message || "Failed to process image with Zoho Zia AI" });
+      clearTimeout(timeoutId);
+      console.error('Zia AI Error:', e);
+      if (e.name === 'AbortError') {
+        setResults({
+          error: 'Request timed out after 120 seconds.',
+          details: 'The image may be too large or the Zoho Zia service is slow. Try a smaller/clearer image. If the issue persists, increase the function timeout in Catalyst Console → Functions → police_fir_api → Configuration.'
+        });
+      } else {
+        setResults({ error: e.message || 'Failed to process image with Zoho Zia AI' });
+      }
     } finally {
       setLoading(false);
     }

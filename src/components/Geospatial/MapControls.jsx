@@ -468,6 +468,8 @@ export default function MapControls({
                   <option value="7D">{translations[lang].mapControls.past7Days}</option>
                   <option value="30D">{translations[lang].mapControls.past30Days}</option>
                   <option value="90D">{translations[lang].mapControls.past90Days}</option>
+                  <option value="180D">{translations[lang].mapControls.past180Days || 'Past 6 Months (180 Days)'}</option>
+                  <option value="1Y">{translations[lang].mapControls.past1Year || 'Past 1 Year (365 Days)'}</option>
                 </select>
               </div>
             </div>

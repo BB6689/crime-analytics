@@ -383,6 +383,20 @@ export default function CrimeMap({
       if (selectedPoliceStationId && inc.policeStationId !== selectedPoliceStationId) return false;
       if (activeFilters.type !== 'ALL' && inc.type !== activeFilters.type) return false;
       if (activeFilters.status !== 'ALL' && inc.status !== activeFilters.status) return false;
+      if (activeFilters.timeRange && activeFilters.timeRange !== 'ALL') {
+        const rawDate = inc.date || inc.crimeRegisteredDate || inc.RegisteredDate || inc.IncidentFromDate;
+        if (rawDate) {
+          const incTime = new Date(rawDate).getTime();
+          if (!isNaN(incTime)) {
+            const diffDays = (Date.now() - incTime) / (1000 * 60 * 60 * 24);
+            if (activeFilters.timeRange === '7D' && diffDays > 7) return false;
+            if (activeFilters.timeRange === '30D' && diffDays > 30) return false;
+            if (activeFilters.timeRange === '90D' && diffDays > 90) return false;
+            if (activeFilters.timeRange === '180D' && diffDays > 180) return false;
+            if ((activeFilters.timeRange === '1Y' || activeFilters.timeRange === '365D') && diffDays > 365) return false;
+          }
+        }
+      }
       return true;
     });
 

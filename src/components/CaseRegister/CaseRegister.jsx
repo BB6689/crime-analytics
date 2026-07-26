@@ -299,6 +299,7 @@ export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterGravity, setFilterGravity] = useState('');
   const [filterHead, setFilterHead] = useState('');
+  const [filterTimeRange, setFilterTimeRange] = useState('ALL');
   const [selectedCase, setSelectedCase] = useState(null);
 
   const crimeHeads = useMemo(() => {
@@ -308,14 +309,32 @@ export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
+    const nowTime = Date.now();
     return incidentsList.filter(c => {
       const matchSearch = !q || [c.CrimeNo, c.CaseNo, c.MajorHead, c.MinorHead, c.PoliceStation, c.OfficerName, c.BriefFacts].some(v => v && String(v).toLowerCase().includes(q));
       const matchStatus = !filterStatus || c.Status === filterStatus;
       const matchGravity = !filterGravity || c.Gravity === filterGravity;
       const matchHead = !filterHead || c.MajorHead === filterHead;
-      return matchSearch && matchStatus && matchGravity && matchHead;
+      
+      let matchTime = true;
+      if (filterTimeRange && filterTimeRange !== 'ALL') {
+        const rawDate = c.RegisteredDate || c.date || c.IncidentFromDate || c.crimeRegisteredDate;
+        if (rawDate) {
+          const t = new Date(rawDate).getTime();
+          if (!isNaN(t)) {
+            const diffDays = (nowTime - t) / (1000 * 60 * 60 * 24);
+            if (filterTimeRange === '7D' && diffDays > 7) matchTime = false;
+            else if (filterTimeRange === '30D' && diffDays > 30) matchTime = false;
+            else if (filterTimeRange === '90D' && diffDays > 90) matchTime = false;
+            else if (filterTimeRange === '180D' && diffDays > 180) matchTime = false;
+            else if (filterTimeRange === '1Y' && diffDays > 365) matchTime = false;
+          }
+        }
+      }
+
+      return matchSearch && matchStatus && matchGravity && matchHead && matchTime;
     });
-  }, [incidentsList, search, filterStatus, filterGravity, filterHead]);
+  }, [incidentsList, search, filterStatus, filterGravity, filterHead, filterTimeRange]);
 
   return (
     <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
@@ -325,6 +344,14 @@ export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
             <Search size={13} style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }}/>
             <input className="form-input" style={{ paddingLeft: '2rem', width: '100%', fontSize: '0.75rem' }} placeholder="Search CrimeNo, station, crime type, officer..." value={search} onChange={e => setSearch(e.target.value)}/>
           </div>
+          <select className="form-select" style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem' }} value={filterTimeRange} onChange={e => setFilterTimeRange(e.target.value)}>
+            <option value="ALL">All Time</option>
+            <option value="7D">Last 7 Days</option>
+            <option value="30D">Last 30 Days (1 Month)</option>
+            <option value="90D">Last 3 Months (90 Days)</option>
+            <option value="180D">Last 6 Months (180 Days)</option>
+            <option value="1Y">Last 1 Year (365 Days)</option>
+          </select>
           <select className="form-select" style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem' }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
             <option value="">All Statuses</option>
             <option>Under Investigation</option>
