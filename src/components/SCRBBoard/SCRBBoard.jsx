@@ -126,6 +126,7 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
   const [timeRange, setTimeRange] = useState('ALL');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('ALL');
   const [selectedStation, setSelectedStation] = useState('ALL');
   const [selectedOfficer, setSelectedOfficer] = useState('ALL');
 
@@ -179,26 +180,50 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
   useEffect(() => { fetchAnalytics(); }, []);
   useEffect(() => { if (incidentsList.length > 0 && !analytics) setAnalytics(computeFromIncidents(incidentsList)); }, [incidentsList]);
 
-  // Unique lists for Station and Officer dropdowns
-  const stationOptions = useMemo(() => {
+  // Unique list of Districts & Commissionerate Cities for dropdown
+  const districtOptions = useMemo(() => {
     const set = new Set();
     incidentsList.forEach(inc => {
+      const d = inc.district || inc.District || inc.DistrictName;
+      if (d) set.add(d);
+    });
+    return Array.from(set).sort();
+  }, [incidentsList]);
+
+  // Unique lists for Station and Officer dropdowns (dynamically scoped to selected District)
+  const stationOptions = useMemo(() => {
+    const set = new Set();
+    let sourceList = incidentsList;
+    if (selectedDistrict && selectedDistrict !== 'ALL') {
+      sourceList = sourceList.filter(inc => {
+        const d = inc.district || inc.District || inc.DistrictName || '';
+        return d === selectedDistrict;
+      });
+    }
+    sourceList.forEach(inc => {
       const st = inc.PoliceStation || inc.UnitName || inc.policeStationName;
       if (st) set.add(st);
     });
     return Array.from(set).sort();
-  }, [incidentsList]);
+  }, [incidentsList, selectedDistrict]);
 
   const officerOptions = useMemo(() => {
     const set = new Set();
-    incidentsList.forEach(inc => {
+    let sourceList = incidentsList;
+    if (selectedDistrict && selectedDistrict !== 'ALL') {
+      sourceList = sourceList.filter(inc => {
+        const d = inc.district || inc.District || inc.DistrictName || '';
+        return d === selectedDistrict;
+      });
+    }
+    sourceList.forEach(inc => {
       const off = inc.OfficerName || inc.policePersonName || inc.officer;
       if (off) set.add(off);
     });
     return Array.from(set).sort();
-  }, [incidentsList]);
+  }, [incidentsList, selectedDistrict]);
 
-  // Filter incidents by time range, selected station, and selected officer
+  // Filter incidents by time range, selected district, selected station, and selected officer
   const filteredIncidents = useMemo(() => {
     let list = incidentsList;
     const now = Date.now();
@@ -233,7 +258,15 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
       });
     }
 
-    // 2. Station filter
+    // 2. District / City filter
+    if (selectedDistrict && selectedDistrict !== 'ALL') {
+      list = list.filter(inc => {
+        const d = inc.district || inc.District || inc.DistrictName || '';
+        return d === selectedDistrict;
+      });
+    }
+
+    // 3. Station filter
     if (selectedStation && selectedStation !== 'ALL') {
       list = list.filter(inc => {
         const stName = inc.PoliceStation || inc.UnitName || inc.policeStationName || '';
@@ -241,7 +274,7 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
       });
     }
 
-    // 3. Officer filter
+    // 4. Officer filter
     if (selectedOfficer && selectedOfficer !== 'ALL') {
       list = list.filter(inc => {
         const off = inc.OfficerName || inc.policePersonName || inc.officer || '';
@@ -250,15 +283,15 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
     }
 
     return list;
-  }, [incidentsList, timeRange, customFrom, customTo, selectedStation, selectedOfficer]);
+  }, [incidentsList, timeRange, customFrom, customTo, selectedDistrict, selectedStation, selectedOfficer]);
 
   // Compute effective analytics dynamically from filteredIncidents
   const effectiveAnalytics = useMemo(() => {
-    if (timeRange !== 'ALL' || selectedStation !== 'ALL' || selectedOfficer !== 'ALL' || !analytics) {
+    if (timeRange !== 'ALL' || selectedDistrict !== 'ALL' || selectedStation !== 'ALL' || selectedOfficer !== 'ALL' || !analytics) {
       return computeFromIncidents(filteredIncidents);
     }
     return analytics;
-  }, [analytics, filteredIncidents, timeRange, selectedStation, selectedOfficer]);
+  }, [analytics, filteredIncidents, timeRange, selectedDistrict, selectedStation, selectedOfficer]);
 
   // Compute Station-Wise Aggregation Report
   const stationReports = useMemo(() => {
@@ -501,6 +534,26 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
           </div>
         )}
 
+        {/* District / City selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <Filter size={14} style={{ color: 'var(--accent)' }} />
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 700 }}>District / City:</span>
+          <select
+            className="form-select"
+            style={{ fontSize: '0.72rem', padding: '0.3rem 0.6rem', maxWidth: '190px' }}
+            value={selectedDistrict}
+            onChange={(e) => {
+              setSelectedDistrict(e.target.value);
+              setSelectedStation('ALL'); // Reset station when district changes
+            }}
+          >
+            <option value="ALL">All Districts & Cities ({districtOptions.length})</option>
+            {districtOptions.map(d => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+        </div>
+
         {/* Police Station selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <Building2 size={14} style={{ color: 'var(--accent)' }} />
@@ -535,9 +588,9 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
           </select>
         </div>
 
-        {(timeRange !== 'ALL' || selectedStation !== 'ALL' || selectedOfficer !== 'ALL') && (
+        {(timeRange !== 'ALL' || selectedDistrict !== 'ALL' || selectedStation !== 'ALL' || selectedOfficer !== 'ALL') && (
           <button
-            onClick={() => { setTimeRange('ALL'); setSelectedStation('ALL'); setSelectedOfficer('ALL'); setCustomFrom(''); setCustomTo(''); }}
+            onClick={() => { setTimeRange('ALL'); setSelectedDistrict('ALL'); setSelectedStation('ALL'); setSelectedOfficer('ALL'); setCustomFrom(''); setCustomTo(''); }}
             style={{ fontSize: '0.68rem', padding: '0.3rem 0.65rem', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', borderRadius: 4, cursor: 'pointer', marginLeft: 'auto', fontWeight: 700 }}
           >
             Reset Filters
@@ -549,7 +602,7 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
       {viewMode === 'overview' && (
         <>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'0.75rem' }}>
-            <KPITile icon={FileText}      label="Total FIRs"          value={analytics.totalCases}                        sub="All registered cases"    color="#00f0ff"/>
+            <KPITile icon={FileText}      label="Total FIRs"          value={effectiveAnalytics.totalCases}               sub="All registered cases"    color="#00f0ff"/>
             <KPITile icon={Search}        label="Under Investigation"  value={kpis ? kpis.underInv : 0}                   sub="Pending resolution"      color="#eab308"/>
             <KPITile icon={Scale}         label="Charge Sheeted"       value={kpis ? kpis.chargesheeted : 0}              sub="Filed before court"      color="#a855f7"/>
             <KPITile icon={CheckCircle}   label="Closed/Disposed"      value={kpis ? kpis.closed : 0}                     sub="Final resolution"        color="#10b981"/>

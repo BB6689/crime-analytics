@@ -296,6 +296,7 @@ function CaseDossier({ caseItem, onClose, lang = 'en' }) {
 
 export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
   const [search, setSearch] = useState('');
+  const [filterDistrict, setFilterDistrict] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterGravity, setFilterGravity] = useState('');
   const [filterHead, setFilterHead] = useState('');
@@ -303,6 +304,11 @@ export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
   const [selectedCase, setSelectedCase] = useState(null);
+
+  const districtOptions = useMemo(() => {
+    const set = new Set(incidentsList.map(i => i.district || i.District || i.DistrictName).filter(Boolean));
+    return Array.from(set).sort();
+  }, [incidentsList]);
 
   const crimeHeads = useMemo(() => {
     const heads = new Set(incidentsList.map(i => i.MajorHead).filter(Boolean));
@@ -314,6 +320,8 @@ export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
     const nowTime = Date.now();
     return incidentsList.filter(c => {
       const matchSearch = !q || [c.CrimeNo, c.CaseNo, c.MajorHead, c.MinorHead, c.PoliceStation, c.OfficerName, c.BriefFacts].some(v => v && String(v).toLowerCase().includes(q));
+      const distVal = c.district || c.District || c.DistrictName || '';
+      const matchDistrict = !filterDistrict || distVal === filterDistrict;
       const matchStatus = !filterStatus || c.Status === filterStatus;
       const matchGravity = !filterGravity || c.Gravity === filterGravity;
       const matchHead = !filterHead || c.MajorHead === filterHead;
@@ -345,9 +353,9 @@ export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
         }
       }
 
-      return matchSearch && matchStatus && matchGravity && matchHead && matchTime;
+      return matchSearch && matchDistrict && matchStatus && matchGravity && matchHead && matchTime;
     });
-  }, [incidentsList, search, filterStatus, filterGravity, filterHead, filterTimeRange, customFrom, customTo]);
+  }, [incidentsList, search, filterDistrict, filterStatus, filterGravity, filterHead, filterTimeRange, customFrom, customTo]);
 
   return (
     <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
@@ -357,6 +365,12 @@ export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
             <Search size={13} style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }}/>
             <input className="form-input" style={{ paddingLeft: '2rem', width: '100%', fontSize: '0.75rem' }} placeholder="Search CrimeNo, station, crime type, officer..." value={search} onChange={e => setSearch(e.target.value)}/>
           </div>
+          {districtOptions.length > 0 && (
+            <select className="form-select" style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem', maxWidth: '160px' }} value={filterDistrict} onChange={e => setFilterDistrict(e.target.value)}>
+              <option value="">All Districts & Cities</option>
+              {districtOptions.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+          )}
           <select className="form-select" style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem' }} value={filterTimeRange} onChange={e => setFilterTimeRange(e.target.value)}>
             <option value="ALL">All Time</option>
             <option value="7D">Last 7 Days</option>
