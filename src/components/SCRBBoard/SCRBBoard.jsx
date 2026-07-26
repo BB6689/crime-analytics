@@ -122,6 +122,13 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
   const [officerSearch, setOfficerSearch] = useState('');
   const [officerSort, setOfficerSort] = useState('total'); // 'total' | 'detection' | 'chargesheeted'
 
+  // Time & Entity Filters for SCRB Dashboard
+  const [timeRange, setTimeRange] = useState('ALL');
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
+  const [selectedStation, setSelectedStation] = useState('ALL');
+  const [selectedOfficer, setSelectedOfficer] = useState('ALL');
+
   const fetchAnalytics = async () => {
     setLoading(true);
     setLoadingError(null);
@@ -139,11 +146,9 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
     } catch (e) {
       console.warn('Analytics API unavailable:', e.message);
       setLoadingError(e.message);
-      // Use mock data based on incidents list
       if (incidentsList && incidentsList.length > 0) {
         setAnalytics(computeFromIncidents(incidentsList));
       } else {
-        // Provide empty analytics structure
         setAnalytics({
           totalCases: 0,
           byStatus: [],
@@ -174,23 +179,91 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
   useEffect(() => { fetchAnalytics(); }, []);
   useEffect(() => { if (incidentsList.length > 0 && !analytics) setAnalytics(computeFromIncidents(incidentsList)); }, [incidentsList]);
 
-  // Compute Station-Wise Aggregation Report
-  const stationReports = useMemo(() => {
-    if (analytics && Array.isArray(analytics.byStation) && analytics.byStation.length > 0) {
-      return analytics.byStation.map(s => ({
-        station: s.station || 'Station HQ',
-        total: s.total || 0,
-        underInv: s.underInv || 0,
-        chargesheeted: s.chargesheeted || 0,
-        closed: s.closed || 0,
-        heinous: s.heinous || 0,
-        arrests: s.arrests || 0,
-        detectionRate: s.total > 0 ? Math.round(((s.chargesheeted || 0) / s.total) * 100) : 0
-      }));
+  // Unique lists for Station and Officer dropdowns
+  const stationOptions = useMemo(() => {
+    const set = new Set();
+    incidentsList.forEach(inc => {
+      const st = inc.PoliceStation || inc.UnitName || inc.policeStationName;
+      if (st) set.add(st);
+    });
+    return Array.from(set).sort();
+  }, [incidentsList]);
+
+  const officerOptions = useMemo(() => {
+    const set = new Set();
+    incidentsList.forEach(inc => {
+      const off = inc.OfficerName || inc.policePersonName || inc.officer;
+      if (off) set.add(off);
+    });
+    return Array.from(set).sort();
+  }, [incidentsList]);
+
+  // Filter incidents by time range, selected station, and selected officer
+  const filteredIncidents = useMemo(() => {
+    let list = incidentsList;
+    const now = Date.now();
+
+    // 1. Time filter
+    if (timeRange && timeRange !== 'ALL') {
+      list = list.filter(inc => {
+        const rawDate = inc.date || inc.crimeRegisteredDate || inc.RegisteredDate || inc.IncidentFromDate;
+        if (!rawDate) return true;
+        const t = new Date(rawDate).getTime();
+        if (isNaN(t)) return true;
+
+        if (timeRange === 'CUSTOM') {
+          if (customFrom) {
+            const f = new Date(customFrom).getTime();
+            if (!isNaN(f) && t < f) return false;
+          }
+          if (customTo) {
+            const toT = new Date(customTo).getTime() + (24 * 60 * 60 * 1000 - 1);
+            if (!isNaN(toT) && t > toT) return false;
+          }
+          return true;
+        }
+
+        const diffDays = (now - t) / (1000 * 60 * 60 * 24);
+        if (timeRange === '7D') return diffDays <= 7;
+        if (timeRange === '30D') return diffDays <= 30;
+        if (timeRange === '90D') return diffDays <= 90;
+        if (timeRange === '180D') return diffDays <= 180;
+        if (timeRange === '1Y' || timeRange === '365D') return diffDays <= 365;
+        return true;
+      });
     }
 
+    // 2. Station filter
+    if (selectedStation && selectedStation !== 'ALL') {
+      list = list.filter(inc => {
+        const stName = inc.PoliceStation || inc.UnitName || inc.policeStationName || '';
+        return stName === selectedStation;
+      });
+    }
+
+    // 3. Officer filter
+    if (selectedOfficer && selectedOfficer !== 'ALL') {
+      list = list.filter(inc => {
+        const off = inc.OfficerName || inc.policePersonName || inc.officer || '';
+        return off === selectedOfficer;
+      });
+    }
+
+    return list;
+  }, [incidentsList, timeRange, customFrom, customTo, selectedStation, selectedOfficer]);
+
+  // Compute effective analytics dynamically from filteredIncidents
+  const effectiveAnalytics = useMemo(() => {
+    if (timeRange !== 'ALL' || selectedStation !== 'ALL' || selectedOfficer !== 'ALL' || !analytics) {
+      return computeFromIncidents(filteredIncidents);
+    }
+    return analytics;
+  }, [analytics, filteredIncidents, timeRange, selectedStation, selectedOfficer]);
+
+  // Compute Station-Wise Aggregation Report
+  const stationReports = useMemo(() => {
     const map = new Map();
-    incidentsList.forEach(inc => {
+    filteredIncidents.forEach(inc => {
       const stName = inc.PoliceStation || inc.UnitName || inc.policeStationName || 'Station Headquarters';
       if (!map.has(stName)) {
         map.set(stName, {
@@ -218,26 +291,12 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
       ...s,
       detectionRate: s.total > 0 ? Math.round((s.chargesheeted / s.total) * 100) : 0
     }));
-  }, [incidentsList, analytics]);
+  }, [filteredIncidents]);
 
   // Compute Officer-Wise Aggregation Report
   const officerReports = useMemo(() => {
-    if (analytics && Array.isArray(analytics.byOfficer) && analytics.byOfficer.length > 0) {
-      return analytics.byOfficer.map(o => ({
-        officer: o.officer || 'Investigating Officer',
-        kgid: o.kgid || 'KGID-' + Math.floor(100000 + Math.random() * 900000),
-        station: o.station || 'Precinct HQ',
-        total: o.total || 0,
-        underInv: o.underInv || 0,
-        chargesheeted: o.chargesheeted || 0,
-        closed: o.closed || 0,
-        arrests: o.arrests || 0,
-        detectionRate: o.total > 0 ? Math.round(((o.chargesheeted || 0) / o.total) * 100) : 0
-      }));
-    }
-
     const map = new Map();
-    incidentsList.forEach(inc => {
+    filteredIncidents.forEach(inc => {
       const officer = inc.OfficerName || inc.policePersonName || inc.officer || 'PSI Officer';
       const stName = inc.PoliceStation || inc.UnitName || 'Precinct Command';
       if (!map.has(officer)) {
@@ -266,7 +325,7 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
       ...o,
       detectionRate: o.total > 0 ? Math.round((o.chargesheeted / o.total) * 100) : 0
     }));
-  }, [incidentsList, analytics]);
+  }, [filteredIncidents]);
 
   const filteredStations = useMemo(() => {
     let list = [...stationReports];
@@ -292,22 +351,22 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
   }, [officerReports, officerSearch, officerSort]);
 
   const kpis = useMemo(() => {
-    if (!analytics) return null;
-    const { byStatus = [], chargesheetTypes = [], totalCases, totalArrests } = analytics;
+    if (!effectiveAnalytics) return null;
+    const { byStatus = [], chargesheetTypes = [], totalCases, totalArrests } = effectiveAnalytics;
     const findCount = (arr, pred) => { const found = arr.find(pred); return found ? found.count : 0; };
     const underInv = findCount(byStatus, s => s.status && s.status.includes('Investigation'));
     const chargesheeted = findCount(byStatus, s => s.status && s.status.includes('Charge'));
     const closed = findCount(byStatus, s => s.status && (s.status.includes('Closed') || s.status.includes('Disposed')));
     const falseCase = findCount(chargesheetTypes, c => c.cstype === 'B');
     const detectionRate = totalCases > 0 ? Math.round((chargesheeted / totalCases) * 100) : 0;
-    const heinous = analytics.byGravity ? findCount(analytics.byGravity, g => g.gravity && g.gravity.includes('Heinous') && !g.gravity.includes('Non')) : 0;
+    const heinous = effectiveAnalytics.byGravity ? findCount(effectiveAnalytics.byGravity, g => g.gravity && g.gravity.includes('Heinous') && !g.gravity.includes('Non')) : 0;
     return { underInv, chargesheeted, closed, totalArrests: totalArrests || 0, detectionRate, falseCase, heinous };
-  }, [analytics]);
+  }, [effectiveAnalytics]);
 
   const monthlyData = useMemo(() => {
-    if (!analytics || !analytics.byMonth) return [];
-    return [...analytics.byMonth].reverse().map(m => ({ ...m, month: formatMonth(m.month) }));
-  }, [analytics]);
+    if (!effectiveAnalytics || !effectiveAnalytics.byMonth) return [];
+    return [...effectiveAnalytics.byMonth].reverse().map(m => ({ ...m, month: formatMonth(m.month) }));
+  }, [effectiveAnalytics]);
 
   // Export Station CSV
   const handleExportStationCSV = () => {
@@ -331,7 +390,7 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
     </div>
   );
   
-  if (!analytics) return (
+  if (!effectiveAnalytics) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', flexDirection:'column', gap:'1.5rem', padding:'2rem' }}>
       <AlertCircle size={56} color="#f97316" strokeWidth={1.5}/>
       <div style={{ textAlign:'center' }}>
@@ -347,14 +406,14 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
   );
 
   const statusFunnelData = [
-    { name:'Registered', count:analytics.totalCases, color:'#00f0ff' },
-    ...(analytics.byStatus || []).map(s => ({
+    { name:'Registered', count:effectiveAnalytics.totalCases, color:'#00f0ff' },
+    ...(effectiveAnalytics.byStatus || []).map(s => ({
       name: s.status, count: s.count,
       color: s.status && s.status.includes('Investigation') ? '#eab308' : s.status && s.status.includes('Charge') ? '#a855f7' : '#10b981'
     }))
   ];
-  const crimeHeadData = analytics.byCrimeHead || [];
-  const chargesheetData = (analytics.chargesheetTypes || []).map(c => ({
+  const crimeHeadData = effectiveAnalytics.byCrimeHead || [];
+  const chargesheetData = (effectiveAnalytics.chargesheetTypes || []).map(c => ({
     name: CHARGESHEET_LABELS[c.cstype] || c.cstype,
     value: c.count,
     color: CHARGESHEET_COLORS[c.cstype] || '#64748b'
@@ -408,6 +467,82 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
         <button onClick={fetchAnalytics} style={{ background:'var(--bg-elevated)', border:'1px solid var(--border)', borderRadius:'var(--radius-sm)', padding:'0.35rem 0.75rem', color:'var(--text-secondary)', fontSize:'0.72rem', cursor:'pointer', display:'flex', alignItems:'center', gap:'5px' }}>
           <RefreshCw size={12}/> Refresh
         </button>
+      </div>
+
+      {/* Interactive Global Filters Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', background: 'var(--bg-elevated)', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
+        {/* Timeframe selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <Clock size={14} style={{ color: 'var(--accent)' }} />
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 700 }}>Timeframe:</span>
+          <select
+            className="form-select"
+            style={{ fontSize: '0.72rem', padding: '0.3rem 0.6rem' }}
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value)}
+          >
+            <option value="ALL">All Time (Historical)</option>
+            <option value="7D">Last 7 Days</option>
+            <option value="30D">Last 30 Days (1 Month)</option>
+            <option value="90D">Last 3 Months (90 Days)</option>
+            <option value="180D">Last 6 Months (180 Days)</option>
+            <option value="1Y">Last 1 Year (365 Days)</option>
+            <option value="CUSTOM">📅 Custom Date Range...</option>
+          </select>
+        </div>
+
+        {/* Custom date range inputs */}
+        {timeRange === 'CUSTOM' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'var(--bg-inset)', padding: '2px 6px', borderRadius: 4, border: '1px solid var(--border-muted)' }}>
+            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>From:</span>
+            <input type="date" className="form-input" style={{ fontSize: '0.7rem', padding: '0.2rem 0.4rem' }} value={customFrom} onChange={e => setCustomFrom(e.target.value)} />
+            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>To:</span>
+            <input type="date" className="form-input" style={{ fontSize: '0.7rem', padding: '0.2rem 0.4rem' }} value={customTo} onChange={e => setCustomTo(e.target.value)} />
+          </div>
+        )}
+
+        {/* Police Station selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <Building2 size={14} style={{ color: 'var(--accent)' }} />
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 700 }}>Station:</span>
+          <select
+            className="form-select"
+            style={{ fontSize: '0.72rem', padding: '0.3rem 0.6rem', maxWidth: '190px' }}
+            value={selectedStation}
+            onChange={(e) => setSelectedStation(e.target.value)}
+          >
+            <option value="ALL">All Stations ({stationOptions.length})</option>
+            {stationOptions.map(st => (
+              <option key={st} value={st}>{st}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Police Officer selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <UserCheck size={14} style={{ color: 'var(--accent)' }} />
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 700 }}>Officer:</span>
+          <select
+            className="form-select"
+            style={{ fontSize: '0.72rem', padding: '0.3rem 0.6rem', maxWidth: '190px' }}
+            value={selectedOfficer}
+            onChange={(e) => setSelectedOfficer(e.target.value)}
+          >
+            <option value="ALL">All Officers ({officerOptions.length})</option>
+            {officerOptions.map(off => (
+              <option key={off} value={off}>{off}</option>
+            ))}
+          </select>
+        </div>
+
+        {(timeRange !== 'ALL' || selectedStation !== 'ALL' || selectedOfficer !== 'ALL') && (
+          <button
+            onClick={() => { setTimeRange('ALL'); setSelectedStation('ALL'); setSelectedOfficer('ALL'); setCustomFrom(''); setCustomTo(''); }}
+            style={{ fontSize: '0.68rem', padding: '0.3rem 0.65rem', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', borderRadius: 4, cursor: 'pointer', marginLeft: 'auto', fontWeight: 700 }}
+          >
+            Reset Filters
+          </button>
+        )}
       </div>
 
       {/* VIEW MODE 1: STATE OVERVIEW */}

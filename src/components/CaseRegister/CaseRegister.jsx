@@ -300,6 +300,8 @@ export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
   const [filterGravity, setFilterGravity] = useState('');
   const [filterHead, setFilterHead] = useState('');
   const [filterTimeRange, setFilterTimeRange] = useState('ALL');
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
   const [selectedCase, setSelectedCase] = useState(null);
 
   const crimeHeads = useMemo(() => {
@@ -322,19 +324,30 @@ export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
         if (rawDate) {
           const t = new Date(rawDate).getTime();
           if (!isNaN(t)) {
-            const diffDays = (nowTime - t) / (1000 * 60 * 60 * 24);
-            if (filterTimeRange === '7D' && diffDays > 7) matchTime = false;
-            else if (filterTimeRange === '30D' && diffDays > 30) matchTime = false;
-            else if (filterTimeRange === '90D' && diffDays > 90) matchTime = false;
-            else if (filterTimeRange === '180D' && diffDays > 180) matchTime = false;
-            else if (filterTimeRange === '1Y' && diffDays > 365) matchTime = false;
+            if (filterTimeRange === 'CUSTOM') {
+              if (customFrom) {
+                const f = new Date(customFrom).getTime();
+                if (!isNaN(f) && t < f) matchTime = false;
+              }
+              if (customTo) {
+                const toT = new Date(customTo).getTime() + (24 * 60 * 60 * 1000 - 1);
+                if (!isNaN(toT) && t > toT) matchTime = false;
+              }
+            } else {
+              const diffDays = (nowTime - t) / (1000 * 60 * 60 * 24);
+              if (filterTimeRange === '7D' && diffDays > 7) matchTime = false;
+              else if (filterTimeRange === '30D' && diffDays > 30) matchTime = false;
+              else if (filterTimeRange === '90D' && diffDays > 90) matchTime = false;
+              else if (filterTimeRange === '180D' && diffDays > 180) matchTime = false;
+              else if (filterTimeRange === '1Y' && diffDays > 365) matchTime = false;
+            }
           }
         }
       }
 
       return matchSearch && matchStatus && matchGravity && matchHead && matchTime;
     });
-  }, [incidentsList, search, filterStatus, filterGravity, filterHead, filterTimeRange]);
+  }, [incidentsList, search, filterStatus, filterGravity, filterHead, filterTimeRange, customFrom, customTo]);
 
   return (
     <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
@@ -351,7 +364,15 @@ export default function CaseRegister({ lang = 'en', incidentsList = [] }) {
             <option value="90D">Last 3 Months (90 Days)</option>
             <option value="180D">Last 6 Months (180 Days)</option>
             <option value="1Y">Last 1 Year (365 Days)</option>
+            <option value="CUSTOM">📅 Custom Range...</option>
           </select>
+          {filterTimeRange === 'CUSTOM' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <input type="date" className="form-input" style={{ fontSize: '0.7rem', padding: '0.25rem 0.4rem' }} value={customFrom} onChange={e => setCustomFrom(e.target.value)} title="From Date" />
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>to</span>
+              <input type="date" className="form-input" style={{ fontSize: '0.7rem', padding: '0.25rem 0.4rem' }} value={customTo} onChange={e => setCustomTo(e.target.value)} title="To Date" />
+            </div>
+          )}
           <select className="form-select" style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem' }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
             <option value="">All Statuses</option>
             <option>Under Investigation</option>

@@ -388,12 +388,23 @@ export default function CrimeMap({
         if (rawDate) {
           const incTime = new Date(rawDate).getTime();
           if (!isNaN(incTime)) {
-            const diffDays = (Date.now() - incTime) / (1000 * 60 * 60 * 24);
-            if (activeFilters.timeRange === '7D' && diffDays > 7) return false;
-            if (activeFilters.timeRange === '30D' && diffDays > 30) return false;
-            if (activeFilters.timeRange === '90D' && diffDays > 90) return false;
-            if (activeFilters.timeRange === '180D' && diffDays > 180) return false;
-            if ((activeFilters.timeRange === '1Y' || activeFilters.timeRange === '365D') && diffDays > 365) return false;
+            if (activeFilters.timeRange === 'CUSTOM') {
+              if (activeFilters.customFrom) {
+                const f = new Date(activeFilters.customFrom).getTime();
+                if (!isNaN(f) && incTime < f) return false;
+              }
+              if (activeFilters.customTo) {
+                const t = new Date(activeFilters.customTo).getTime() + (24 * 60 * 60 * 1000 - 1);
+                if (!isNaN(t) && incTime > t) return false;
+              }
+            } else {
+              const diffDays = (Date.now() - incTime) / (1000 * 60 * 60 * 24);
+              if (activeFilters.timeRange === '7D' && diffDays > 7) return false;
+              if (activeFilters.timeRange === '30D' && diffDays > 30) return false;
+              if (activeFilters.timeRange === '90D' && diffDays > 90) return false;
+              if (activeFilters.timeRange === '180D' && diffDays > 180) return false;
+              if ((activeFilters.timeRange === '1Y' || activeFilters.timeRange === '365D') && diffDays > 365) return false;
+            }
           }
         }
       }

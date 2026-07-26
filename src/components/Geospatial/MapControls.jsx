@@ -470,8 +470,34 @@ export default function MapControls({
                   <option value="90D">{translations[lang].mapControls.past90Days}</option>
                   <option value="180D">{translations[lang].mapControls.past180Days || 'Past 6 Months (180 Days)'}</option>
                   <option value="1Y">{translations[lang].mapControls.past1Year || 'Past 1 Year (365 Days)'}</option>
+                  <option value="CUSTOM">📅 Custom Date Range...</option>
                 </select>
               </div>
+
+              {filters.timeRange === 'CUSTOM' && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', background: 'var(--bg-inset)', padding: '0.6rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-muted)' }}>
+                  <div className="filter-group">
+                    <label className="filter-label" style={{ fontSize: '0.65rem' }}>From Date</label>
+                    <input
+                      type="date"
+                      className="form-input"
+                      style={{ fontSize: '0.7rem', padding: '0.25rem 0.4rem' }}
+                      value={filters.customFrom || ''}
+                      onChange={(e) => handleChange('customFrom', e.target.value)}
+                    />
+                  </div>
+                  <div className="filter-group">
+                    <label className="filter-label" style={{ fontSize: '0.65rem' }}>To Date</label>
+                    <input
+                      type="date"
+                      className="form-input"
+                      style={{ fontSize: '0.7rem', padding: '0.25rem 0.4rem' }}
+                      value={filters.customTo || ''}
+                      onChange={(e) => handleChange('customTo', e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <button
