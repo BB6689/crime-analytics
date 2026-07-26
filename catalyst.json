@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "source": "functions",
+    "targets": [
+      "police_fir_api"
+    ],
+    "ignore": []
+  },
+  "client": {
+    "source": "dist"
+  }
+}

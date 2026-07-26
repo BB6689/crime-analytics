@@ -1,0 +1,261 @@
+﻿import React, { useState } from 'react';
+import { Map, BarChart2, Users, FileText, Shield } from 'lucide-react';
+
+// Components
+import CrimeMap from './components/Geospatial/CrimeMap';
+import MapControls from './components/Geospatial/MapControls';
+import MetricCards from './components/Dashboard/MetricCards';
+import AnomalyChart from './components/Dashboard/AnomalyChart';
+import CorrelationChart from './components/Dashboard/CorrelationChart';
+import CriminalNetwork from './components/NetworkAnalysis/CriminalNetwork';
+import NetworkInspector from './components/NetworkAnalysis/NetworkInspector';
+import OffenderList from './components/OffenderTracker/OffenderList';
+import RiskProfiler from './components/OffenderTracker/RiskProfiler';
+
+// Mock data list for header analytics
+import { INCIDENTS, POLICE_STATIONS, DISTRICTS } from './mockData/incidentData';
+import { NETWORK_DATA } from './mockData/criminalNetworkData';
+import { OFFENDER_PROFILES } from './mockData/offenderProfiles';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('map');
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedPoliceStationId, setSelectedPoliceStationId] = useState(null);
+  const [selectedIncident, setSelectedIncident] = useState(null);
+  const [incidentsList, setIncidentsList] = useState(INCIDENTS);
+  const [networkData, setNetworkData] = useState(NETWORK_DATA);
+  const [offenderProfiles, setOffenderProfiles] = useState(OFFENDER_PROFILES);
+  const [selectedOffenderId, setSelectedOffenderId] = useState(null);
+  const [selectedNetworkNode, setSelectedNetworkNode] = useState(null);
+
+  // Map Filter State
+  const [mapFilters, setMapFilters] = useState({
+    type: 'ALL',
+    severity: 'ALL',
+    status: 'ALL',
+    timeRange: 'ALL'
+  });
+
+  const handleResetFilters = () => {
+    setMapFilters({
+      type: 'ALL',
+      severity: 'ALL',
+      status: 'ALL',
+      timeRange: 'ALL'
+    });
+    setSelectedDistrict(null);
+    setSelectedPoliceStationId(null);
+    setSelectedIncident(null);
+  };
+
+  // Switch tabs and set offender focus
+  const handleViewProfileFromNetwork = (offenderId) => {
+    setSelectedOffenderId(offenderId);
+    setActiveTab('offenders');
+  };
+
+  return (
+    <div className="app-container">
+      {/* Platform Header */}
+      <header className="app-header">
+        {/* Left: KSP Logo + Title */}
+        <div className="brand-section">
+          <img
+            src="/ksp_logo.png"
+            alt="KSP Logo"
+            style={{ height: '48px', width: '48px', objectFit: 'contain', borderRadius: '4px' }}
+          />
+          <div>
+            <h1 className="brand-title">KARNATAKA STATE POLICE</h1>
+            <span className="brand-subtitle">Crime Analytics &amp; Intelligence Platform</span>
+          </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <nav className="nav-tabs">
+          <button
+            className={`tab-btn ${activeTab === 'map' ? 'active' : ''}`}
+            onClick={() => setActiveTab('map')}
+          >
+            <Map size={16} />
+            Geospatial Intelligence
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveTab('dashboard')}
+          >
+            <BarChart2 size={16} />
+            Statistical Dashboard
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'network' ? 'active' : ''}`}
+            onClick={() => setActiveTab('network')}
+          >
+            <Users size={16} />
+            Criminal Link Analysis
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'offenders' ? 'active' : ''}`}
+            onClick={() => setActiveTab('offenders')}
+          >
+            <FileText size={16} />
+            Offender Profiler
+          </button>
+        </nav>
+
+        {/* Right: Team info + Status */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem' }}>
+          <div className="system-status">
+            <div className="status-dot" />
+            <span>KSP System: Active</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.1rem' }}>
+            <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--accent-gold)', textTransform: 'uppercase' }}>
+              âœ¦ Code &amp; Clues
+            </span>
+            <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>
+              Bhavajna &bull; Balaji
+            </span>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Workspace Frame */}
+      <main className="app-content">
+        
+        {/* TAB 1: GEOSPATIAL MAP VIEW */}
+        {activeTab === 'map' && (
+          <div className="visualizer-split">
+            {/* Interactive Leaflet Map Box */}
+            <div className="glass-panel" style={{ height: '100%', padding: '0.75rem', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '1.25rem', left: '1.25rem', zIndex: 1000, pointerEvents: 'none' }}>
+                <div className="glass-panel" style={{ padding: '0.5rem 0.8rem', pointerEvents: 'auto', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Selected District:</span>
+                    <select
+                      className="form-select"
+                      style={{ width: 'auto', padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
+                      value={selectedDistrict || ''}
+                      onChange={(e) => {
+                        setSelectedDistrict(e.target.value || null);
+                        setSelectedPoliceStationId(null);
+                      }}
+                    >
+                      <option value="">Select District / Division</option>
+                    {Object.keys(DISTRICTS).map(key => (
+                      <option key={key} value={key}>{DISTRICTS[key].name.replace(' (District)', '')}</option>
+                    ))}
+                  </select>
+
+                  {selectedDistrict && (
+                    <>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: '0.75rem' }}>Selected Precinct:</span>
+                      <select
+                        className="form-select"
+                        style={{ width: 'auto', padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
+                        value={selectedPoliceStationId || ''}
+                        onChange={(e) => setSelectedPoliceStationId(e.target.value || null)}
+                      >
+                        <option value="">All Stations</option>
+                        {Object.values(POLICE_STATIONS)
+                          .filter(s => s.district === selectedDistrict)
+                          .map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))
+                        }
+                      </select>
+                    </>
+                  )}
+                </div>
+              </div>
+              <CrimeMap
+                selectedDistrict={selectedDistrict}
+                setSelectedDistrict={setSelectedDistrict}
+                selectedPoliceStationId={selectedPoliceStationId}
+                setSelectedPoliceStationId={setSelectedPoliceStationId}
+                selectedIncident={selectedIncident}
+                setSelectedIncident={setSelectedIncident}
+                activeFilters={mapFilters}
+                incidentsList={incidentsList}
+              />
+            </div>
+            
+            {/* Map Filters & Advisories Sidebar */}
+            <MapControls
+              selectedDistrict={selectedDistrict}
+              selectedPoliceStationId={selectedPoliceStationId}
+              setSelectedPoliceStationId={setSelectedPoliceStationId}
+              selectedIncident={selectedIncident}
+              setSelectedIncident={setSelectedIncident}
+              filters={mapFilters}
+              setFilters={setMapFilters}
+              onReset={handleResetFilters}
+              incidentsList={incidentsList}
+              setIncidentsList={setIncidentsList}
+              networkData={networkData}
+              setNetworkData={setNetworkData}
+              offenderProfiles={offenderProfiles}
+              setOffenderProfiles={setOffenderProfiles}
+            />
+          </div>
+        )}
+
+        {/* TAB 2: ANALYTICS DASHBOARD */}
+        {activeTab === 'dashboard' && (
+          <div className="full-size-panel" style={{ overflowY: 'auto' }}>
+            {/* KPI top widgets */}
+            <MetricCards />
+
+            {/* Split charts area */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', flex: 1, minHeight: '380px' }}>
+              {/* Crime Trend Lines and Outliers */}
+              <AnomalyChart />
+
+              {/* Socio-economic Correlation Scatter Plot */}
+              <CorrelationChart />
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: NETWORK & LINK ANALYSIS */}
+        {activeTab === 'network' && (
+          <div className="visualizer-split">
+            {/* Interactive SVG force directed graph */}
+            <CriminalNetwork
+              selectedNode={selectedNetworkNode}
+              setSelectedNode={setSelectedNetworkNode}
+              networkData={networkData}
+              setNetworkData={setNetworkData}
+            />
+
+            {/* dossier details sidebar */}
+            <NetworkInspector
+              selectedNode={selectedNetworkNode}
+              onViewProfile={handleViewProfileFromNetwork}
+              networkData={networkData}
+            />
+          </div>
+        )}
+
+        {/* TAB 4: OFFENDER PROFILE DOSSIERS & SIMULATION */}
+        {activeTab === 'offenders' && (
+          <div className="visualizer-split">
+            {/* Repeat Offender list directory */}
+            <OffenderList
+              selectedOffenderId={selectedOffenderId}
+              setSelectedOffenderId={setSelectedOffenderId}
+              offenderProfiles={offenderProfiles}
+            />
+
+            {/* Risk assess engine simulation and timelines */}
+            <RiskProfiler
+              offenderId={selectedOffenderId}
+              offenderProfiles={offenderProfiles}
+            />
+          </div>
+        )}
+
+      </main>
+    </div>
+  );
+}
+
