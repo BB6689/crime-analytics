@@ -562,21 +562,29 @@ export default function SCRBBoard({ lang = 'en', incidentsList = [] }) {
             {/* PREDICTIVE DISTRICT RISK PROFILER */}
             <SCard title="🎯 Predictive District Risk Intelligence">
               {(() => {
+                const total = analytics.totalCases || 0;
+
+                if (total === 0) {
+                  return <EmptyState message="No district risk intelligence data" sub="Register FIRs to calculate multi-variate risk scores" />;
+                }
+
                 // Compute risk scores from available data
                 const byHead = analytics.byCrimeHead || [];
-                const total = analytics.totalCases || 0;
-                const heinous = analytics.byGravity ? (analytics.byGravity.find(g => g.gravity && g.gravity.includes('Heinous') && !g.gravity.includes('Non')) || {}).count || 0 : Math.round(total * 0.18);
+                const heinousObj = analytics.byGravity ? (analytics.byGravity.find(g => g.gravity && g.gravity.includes('Heinous') && !g.gravity.includes('Non')) || {}) : {};
+                const heinous = heinousObj.count || 0;
                 const underInv = (analytics.byStatus || []).find(s => s.status && s.status.includes('Investigation')) || {};
-                const pendingPct = total > 0 ? Math.round(((underInv.count || 0) / total) * 100) : 0;
-                const heinousPct = total > 0 ? Math.round((heinous / total) * 100) : 18;
-                const cdrPct = analytics.totalCases > 0 ? (analytics.chargesheetTypes || []).reduce((acc, c) => acc + (c.count||0), 0) / analytics.totalCases * 100 : 42;
-                const violentPct = byHead.filter(h => h.name && (h.name.includes('Person') || h.name.includes('Murder') || h.name.includes('Violent'))).reduce((a,h) => a+h.count, 0) / Math.max(total,1) * 100;
+                const pendingPct = Math.round(((underInv.count || 0) / total) * 100);
+                const heinousPct = Math.round((heinous / total) * 100);
+                const totalCs = (analytics.chargesheetTypes || []).reduce((acc, c) => acc + (c.count||0), 0);
+                const cdrPct = Math.round((totalCs / total) * 100);
+                const violentCount = byHead.filter(h => h.name && (h.name.includes('Person') || h.name.includes('Murder') || h.name.includes('Violent'))).reduce((a,h) => a+h.count, 0);
+                const violentPct = Math.round((violentCount / total) * 100);
 
                 const RISK_DIMS = [
-                  { label: 'Heinous Crime Ratio', value: Math.min(99, heinousPct * 2.5), color: '#f43f5e', desc: `${heinousPct}% of FIRs are heinous offences` },
+                  { label: 'Heinous Crime Ratio', value: Math.min(99, Math.round(heinousPct * 2.5)), color: '#f43f5e', desc: `${heinousPct}% of FIRs are heinous offences` },
                   { label: 'Pending Resolution', value: Math.min(99, pendingPct), color: '#f59e0b', desc: `${pendingPct}% cases still under investigation` },
-                  { label: 'Violent Crime Index', value: Math.min(99, Math.round(violentPct * 2)), color: '#a78bfa', desc: `${Math.round(violentPct)}% crimes against persons` },
-                  { label: 'Low Clearance Risk', value: Math.min(99, Math.max(0, 100 - cdrPct)), color: '#f97316', desc: `${Math.round(cdrPct)}% chargesheet clearance rate` },
+                  { label: 'Violent Crime Index', value: Math.min(99, Math.round(violentPct * 2)), color: '#a78bfa', desc: `${violentPct}% crimes against persons` },
+                  { label: 'Low Clearance Risk', value: Math.min(99, Math.max(0, 100 - cdrPct)), color: '#f97316', desc: `${cdrPct}% chargesheet clearance rate` },
                   { label: 'AI Composite Score', value: Math.min(99, Math.round((heinousPct * 0.35 + pendingPct * 0.3 + violentPct * 0.35) * 2.2)), color: '#00f5ff', desc: 'Multi-dimensional AI risk aggregation' },
                 ];
 
