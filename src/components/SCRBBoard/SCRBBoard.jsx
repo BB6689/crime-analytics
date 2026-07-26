@@ -6,7 +6,7 @@ import {
 import {
   FileText, Search, CheckCircle, XCircle, AlertTriangle, AlertCircle,
   Users, Scale, TrendingUp, TrendingDown, RefreshCw,
-  Building2, UserCheck, Shield, Filter, Download, ArrowUpDown, Award, Activity
+  Building2, UserCheck, Shield, Filter, Download, ArrowUpDown, Award, Activity, Clock
 } from 'lucide-react';
 
 const CHARGESHEET_LABELS = { A: 'Chargesheeted (Form A)', B: 'False Case (Form B)', C: 'Undetected (Form C)' };
