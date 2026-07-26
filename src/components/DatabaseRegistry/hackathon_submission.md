@@ -36,27 +36,28 @@ The system runs on **Zoho Catalyst** (serverless Node.js backend + static client
 
 ### How is it different from existing systems?
 
-| Dimension | Existing KSP Systems | Our Solution |
+| Dimension | Traditional Relational Queries | Our AI-Driven Platform |
 |---|---|---|
-| Data entry | Excel / manual registers | Structured digital FIR with 28-table relational schema |
-| Analytics | Periodic reports, no real-time | Live SCRB dashboard, instant aggregation |
-| Criminal networks | No visualization | Force-directed graph: accused → case → victim links |
-| Offender risk | Manual assessment | AI risk score + recidivism probability + simulator |
-| Chargesheet tracking | Offline paper-based | In-portal Final Report filing (A/B/C) with status transition |
-| Geospatial intel | None | Interactive Karnataka district crime heatmap |
-| Multi-language | English only | English + Kannada + Hindi |
-| Deployment | On-premise silos | Cloud-native on Catalyst (zero-infrastructure) |
+| **Data Preservation** | Standard tabular records across 28 tables | **100% Schema Preservation** + Live 28-Table Relational Explorer |
+| **Criminal Networks** | Isolated row queries per case | **Multi-hop Force-Directed Graph** (Accused ↔ Cases ↔ Co-Accused ↔ Gang Nexus) |
+| **Offender Intelligence** | Static arrest history | **AI Risk Index + Recidivism Forecasting + Rehabilitation Simulator** |
+| **State-Wide Reporting** | Manual query synthesis for SCRB | **Instant SCRB Intelligence Dashboard** (Demographics, Legal Sections, Trends) |
+| **Case Lifecycle** | Disconnected chargesheet records | **In-Portal Final Report Filing (A/B/C)** with automated status transitions |
+| **Geospatial Mapping** | Text-based address records | **Live District Heatmap & Precinct Command Directory** |
+| **AI Integration** | Manual form entry | **Zoho Zia Biometric Face Scan & Automated Document OCR** |
+| **Deployment** | Infrastructure-heavy servers | **Serverless Cloud Native on Zoho Catalyst** |
 
-### How does it solve the problem?
+### How will it be able to solve the problem?
 
-1. **Eliminates data silos** — All 28 db.md tables are live-linked: `CaseMaster → Accused → ArrestSurrender → Court → Employee → Unit → District → State` — a single connected graph of every FIR and its entities
-2. **Enables SCRB reporting** — The Statistical Dashboard aggregates across all stations, officers, crime heads, demographics, and legal sections in real time
-3. **Surfaces hidden networks** — Accused persons who appear across multiple FIRs are automatically clustered into suspect nodes with escalating risk scores
-4. **AI augmentation** — Zoho Zia facial recognition at the scanner desk; AI-generated FIR field extraction from uploaded documents
+1. **Unlocks Hidden Networks on Top of KSP Data** — Leverages KSP's rich 28-table schema to automatically cluster recurring offenders into suspect nodes across districts, surfacing gang networks and co-accused links instantly.
+2. **Closes the Case Lifecycle Loop** — Enables officers to file Final Reports (Chargesheet A, False Case B, Undetected C) directly from case dossiers, automatically updating `CaseMaster.CaseStatusID` and `ChargesheetDetails`.
+3. **Provides SCRB Decision Support** — Aggregates state-wide statistics on top IPC/SLL sections, crime heads, complainant demographics, and station caseloads in real time without custom SQL writing.
+4. **Augments Officers with Serverless AI** — Integrates Zoho Zia face recognition and document field extraction into daily station workflows.
 
 ### USP of the Proposed Solution
 
-> **"From paper FIR to intelligent network — all in one Catalyst-hosted portal, available to any officer with a browser."**
+> **"Maximizing the value of KSP's 28-table data assets through serverless AI, graph network analysis, and end-to-end case lifecycle intelligence — deployed natively on Zoho Catalyst."**
+
 
 - **Zero infrastructure** — deployed serverlessly on Zoho Catalyst
 - **Full schema fidelity** — all 28 KSP-defined tables with correct FK relationships
